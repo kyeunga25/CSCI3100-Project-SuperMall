@@ -45,8 +45,7 @@ router.post('/generate-and-send-otp', async (req, res) => {
         }
 
         // If the email is not registered, generate and store OTP
-        const otp = await generateAndStoreOTP(req.body.email);
-        console.log(otp);
+        await generateAndStoreOTP(req.body.email);
         // Send OTP to the user's email
         await sendOTP(req.body.email);
 

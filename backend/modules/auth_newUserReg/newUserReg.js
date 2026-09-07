@@ -59,7 +59,6 @@ async function sendOTP(email) {
         pass: process.env.MAIL_PASS
       }
     });
-  console.log(process.env.MAIL_USER, process.env.MAIL_PASS, process.env.MAIL_HOST, process.env.MAIL_PORT);
     // Proceed to send the OTP via email
     await transporter.sendMail({
       from: process.env.MAIL_USER, // Sender address

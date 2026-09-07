@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { connectDB, initDB } = require('./modules/dbInit/dbInit');
+const { connectDB } = require('./modules/dbInit/dbInit');
 const cookieParser = require('cookie-parser');
 // Import routes
 const orderRoutes = require('./routes/OrderRoutes');
@@ -30,10 +30,9 @@ app.use(express.json());
 
 app.use(cookieParser());
 
-// Establish connection to the database and initialize it
+// Connect to the existing database without resetting its contents.
 (async () => {
     await connectDB();
-    await initDB();
 
     // // Mount routes after DB initialization
     app.use('/api/products', productRoutes);
