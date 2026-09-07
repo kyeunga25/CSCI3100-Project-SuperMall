@@ -19,13 +19,12 @@ function printCenteredMessage(message, totalLength = 100) {
 // MongoDB connection
 const connectDB = async () => {
     printCenteredMessage("Connecting to MongoDB Server", 100);
-    console.log('MongoURI:', mongoURI);
     try {
         console.log('Connecting to MongoDB...');
         await mongoose.connect(mongoURI);
         printCenteredMessage("DB Connected", 100);
     } catch (err) {
-        console.error(err.message);
+        console.error('Database connection failed.');
         process.exit(1);
     }
 };
@@ -37,17 +36,11 @@ const initDB = async () => {
     console.log('Attempting to list collections...');
     try {
         const collections = await db.listCollections().toArray();
-        console.log('Collections listed:', collections.map(c => c.name));
-
-        // Drop existing collections
-        for (let collection of collections) {
-            console.log(`Dropping collection: ${collection.name}`);
-            await db.dropCollection(collection.name);
-            console.log(`${collection.name} dropped.`);
+        if (collections.length > 0) {
+            throw new Error('Demo initialization requires an empty database.');
         }
     } catch (err) {
-        console.error('Error during collection listing/dropping:', err);
-        return;
+        throw new Error('Demo initialization stopped before writing data.');
     }
 
     // Path to the data folder
