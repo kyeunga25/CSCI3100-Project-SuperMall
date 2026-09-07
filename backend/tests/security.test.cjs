@@ -111,3 +111,24 @@ test('updated mail transport creates an ordinary message entirely offline', asyn
   assert.deepEqual(message.envelope.to, ['reader@example.test']);
   assert.ok(message.message.toString().includes('Safe message'));
 });
+
+test('registration route sends an OTP without logging or returning it', async () => {
+  const handlers = new Map();
+  const router = { use() {}, get() {}, put() {}, post: (route, handler) => handlers.set(route, handler) };
+  let sent = 0;
+  const result = load('modules/auth_newUserReg/auth_newUserReg.js', {
+    express: { Router: () => router, json: () => () => {} },
+    './auth': { authenticateToken() {} }, '../../models/cookies': {},
+    './login': () => {}, cors: () => () => {},
+    './newUserReg': {
+      checkEmail: async () => false, generateAndStoreOTP: async () => '654321',
+      sendOTP: async () => { sent++; }, addNewUser() {},
+    },
+  });
+  let body;
+  const response = { status: () => response, json: value => { body = value; } };
+  await handlers.get('/generate-and-send-otp')({ body: { email: 'reader@example.test' } }, response);
+  assert.equal(sent, 1);
+  assert.ok(result.logs.every(line => !line.includes('654321')));
+  assert.ok(!JSON.stringify(body).includes('654321'));
+});
